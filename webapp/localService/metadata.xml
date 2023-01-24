@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZFI_FIORI_XJOA_PROCESS_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <EntityType Name="AdjustmentType" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SenderCompanyCode"/>
+                    <PropertyRef Name="ControllingArea"/>
+                    <PropertyRef Name="FiscalYear"/>
+                    <PropertyRef Name="Period"/>
+                    <PropertyRef Name="FIDocumentNumber"/>
+                </Key>
+                <Property Name="SenderCompanyCode" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Sender Company Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ControllingArea" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Controlling Area" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FiscalYear" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Period" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Period" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FIDocumentNumber" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="FI Document Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CAPEXOPEX" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="CAPEX / OPEX" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderJV" Type="Edm.String" MaxLength="6" sap:unicode="false" sap:label="Sender JV" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderEG" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="Sender EG" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderBASEntityGroup" Type="Edm.String" MaxLength="6" sap:unicode="false" sap:label="Sender BAS Entity Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverCompanyCode" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="Receiver Company Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverJV" Type="Edm.String" MaxLength="6" sap:unicode="false" sap:label="Receiver JV" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverEG" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="Receiver EG" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverBASEntityGroup" Type="Edm.String" MaxLength="6" sap:unicode="false" sap:label="Receiver BAS Entity Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="AmountInTransactionCurrency" Type="Edm.Decimal" Precision="24" Scale="3" sap:unicode="false" sap:unit="TransactionCurrency" sap:label="Amount in Transaction Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="TransactionCurrency" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="Transaction Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="currency-code"/>
+                <Property Name="AmountInCompanyCodeCurrency" Type="Edm.Decimal" Precision="24" Scale="3" sap:unicode="false" sap:unit="CompanyCodeCurrency" sap:label="Amount in Company Code Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CompanyCodeCurrency" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="Company Code Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="currency-code"/>
+                <Property Name="AmountInGlobalCurrency" Type="Edm.Decimal" Precision="24" Scale="3" sap:unicode="false" sap:unit="GlobalCurrency" sap:label="Amount in Global Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="GlobalCurrency" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="Global Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="currency-code"/>
+                <Property Name="SenderProfitCenter" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Sender Profit Center" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverProfitCenter" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Receiver Profit Center" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderCostCenter" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Sender Cost Center" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverCostCenter" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Receiver Cost Center" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderWBS" Type="Edm.String" MaxLength="8" sap:unicode="false" sap:label="Sender WBS" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverWBS" Type="Edm.String" MaxLength="8" sap:unicode="false" sap:label="Receiver WBS" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderPostedDocNum" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Sender Posted Document Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SenderPostedDocFY" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="Sender Posted Document Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverPostedDocNum" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Receiver Posted Document Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ReceiverPostedDocFY" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="Receiver Posted Document Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FICODocument" Type="Edm.String" MaxLength="2" sap:unicode="false" sap:label="Intercompany FI / Intracompany CO Documents" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Test" Type="Edm.Boolean" sap:unicode="false" sap:label="Test" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Report" Type="Edm.Boolean" sap:unicode="false" sap:label="Report" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PostingDate" Type="Edm.DateTime" Precision="0" sap:unicode="false" sap:label="Posting Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DocumentDate" Type="Edm.DateTime" Precision="0" sap:unicode="false" sap:label="Document Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Message" Type="Edm.String" MaxLength="220" sap:unicode="false" sap:label="Message" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityContainer Name="ZFI_FIORI_XJOA_PROCESS_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="Adjustment" EntityType="ZFI_FIORI_XJOA_PROCESS_SRV.AdjustmentType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <atom:link rel="self" href="https://DEV-SAPS4.WOODSIDE.COM.AU:443/sap/opu/odata/sap/ZFI_FIORI_XJOA_PROCESS_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="https://DEV-SAPS4.WOODSIDE.COM.AU:443/sap/opu/odata/sap/ZFI_FIORI_XJOA_PROCESS_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

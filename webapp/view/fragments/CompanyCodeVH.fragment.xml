@@ -1,0 +1,38 @@
+<core:FragmentDefinition
+		xmlns="sap.ui.comp.valuehelpdialog"
+		xmlns:m="sap.m"
+		xmlns:fb="sap.ui.comp.filterbar"
+		xmlns:core="sap.ui.core">
+	<ValueHelpDialog
+			title="{i18n>companyCode}"
+			ok="onValueHelpOkPress"
+			cancel="onValueHelpCancelPress"
+			supportRanges="true"
+			key="CompanyCode"
+			descriptionKey="CompanyCodeName">
+		<filterBar>
+			<fb:FilterBar advancedMode="true" search="onSearchforVH" isRunningInValueHelpDialog="true">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+						groupName="__$INTERNAL$"
+						name="CompanyCode"
+						label="Company Code"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="CompanyCode" />
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+						groupName="__$INTERNAL$"
+						name="CompanyCodeName"
+						label="Company Code Name"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="CompanyCodeName" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+		</filterBar>
+	</ValueHelpDialog>
+</core:FragmentDefinition>

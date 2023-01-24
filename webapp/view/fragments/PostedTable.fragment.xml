@@ -1,0 +1,209 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:smartTable="sap.ui.comp.smarttable">
+    <Dialog title="Posted Records" stretch="true">
+        <content>
+            <Table id="idTablePostedRecs" autoPopinMode="true" items="{mdlForm>/postRec}" sticky="ColumnHeaders" popinLayout="GridSmall" noDataText="" alternateRowColors="true" selectionChange="handleItemSelection" rememberSelections="false">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer />
+                        <Button icon="sap-icon://excel-attachment" press="onExportPosted"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Period" />
+                    </Column>
+                    <Column>
+                        <Text text="Fiscal Year" />
+                    </Column>
+                    <Column>
+                        <Text text="Message" />
+                    </Column>
+                    <Column>
+                        <Text text="Document Date" />
+                    </Column>
+                    <Column>
+                        <Text text="Posting Date" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Country" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Company Code" />
+                    </Column>
+                    <Column>
+                        <Text text="FI Document Number" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender JV" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Equity Type" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Cost Center" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender WBS Element" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Cost Element" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender Activity" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Country" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Company Code" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver CC FI Document Number" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver CC Fiscal Year" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver JV" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Equity Type" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Cost Center" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver WBS Element" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Cost Element" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver Activity" />
+                    </Column>
+                    <Column>
+                        <Text text="Agreement Type" />
+                    </Column>
+                    <Column>
+                        <Text text="Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="Transaction Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="Amount In Transaction Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="Company Code Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="Amount In Company Code Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="GlobalCurrency" />
+                    </Column>
+                    <Column>
+                        <Text text="Amount In Global Currency" />
+                    </Column>
+                    <Column>
+                        <Text text="Customer" />
+                    </Column>
+                    <Column>
+                        <Text text="Output Tax Code" />
+                    </Column>
+                    <Column>
+                        <Text text="Sender ICO Adj GL" />
+                    </Column>
+                    <Column>
+                        <Text text="Vendor" />
+                    </Column>
+                    <Column>
+                        <Text text="Input Tax Code" />
+                    </Column>
+                    <Column>
+                        <Text text="WHT" />
+                    </Column>
+                    <Column>
+                        <Text text="Receiver ICO Adj GL" />
+                    </Column>
+                    <Column>
+                        <Text text="SummaryInvoiceIndicator" />
+                    </Column>
+                    <Column>
+                        <Text text="Markup Percentage" />
+                    </Column>
+                    <Column>
+                        <Text text="Markup GL" />
+                    </Column>
+                    <Column>
+                        <Text text="Posted Document Number SCC" />
+                    </Column>
+                    <Column>
+                        <Text text="Posted Document FY SCC" />
+                    </Column>
+                    <Column>
+                        <Text text="Posted Document Number RCC" />
+                    </Column>
+                    <Column>
+                        <Text text="Posted Document FY RCC" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem vAlign="Middle">
+                        <cells>
+                            <Text text="{mdlForm>Period}" />
+                            <Text text="{mdlForm>FiscalYear}" />
+                            <Text text="{mdlForm>Message}" />
+                            <Text text="{mdlForm>DocumentDate}" />
+                            <Text text="{mdlForm>PostingDate}" />
+                            <Text text="{mdlForm>SenderCountry}" />
+                            <Text text="{mdlForm>SenderCompanyCode}" />
+                            <Text text="{mdlForm>FIDocumentNumber}" />
+                            <Text text="{mdlForm>SenderJV}" />
+                            <Text text="{mdlForm>SenderEquityType}" />
+                            <Text text="{mdlForm>SenderCostCenter}" />
+                            <Text text="{mdlForm>SenderWBSElement}" />
+                            <Text text="{mdlForm>SenderCostElement}" />
+                            <Text text="{mdlForm>SenderActivity}" />
+                            <Text text="{mdlForm>ReceiverCountry}" />
+                            <Text text="{mdlForm>ReceiverCompanyCode}" />
+                            <Text text="{mdlForm>ReceiverCCFIDocumentNumber}" />
+                            <Text text="{mdlForm>ReceiverCCFiscalYear}" />
+                            <Text text="{mdlForm>ReceiverJV}" />
+                            <Text text="{mdlForm>ReceiverEquityType}" />
+                            <Text text="{mdlForm>ReceiverCostCenter}" />
+                            <Text text="{mdlForm>ReceiverWBSElement}" />
+                            <Text text="{mdlForm>ReceiverCostElement}" />
+                            <Text text="{mdlForm>ReceiverActivity}" />
+                            <Text text="{mdlForm>AgreementType}" />
+                            <Text text="{mdlForm>Currency}" />
+                            <Text text="{mdlForm>TransactionCurrency}" />
+                            <Text text="{mdlForm>AmountInTransactionCurrency}" />
+                            <Text text="{mdlForm>CompanyCodeCurrency}" />
+                            <Text text="{mdlForm>AmountInCompanyCodeCurrency}" />
+                            <Text text="{mdlForm>GlobalCurrency}" />
+                            <Text text="{mdlForm>AmountInGlobalCurrency}" />
+                            <Text text="{mdlForm>Customer}" />
+                            <Text text="{mdlForm>OutputTaxCode}" />
+                            <Text text="{mdlForm>SenderICOAdjGL}" />
+                            <Text text="{mdlForm>Vendor}" />
+                            <Text text="{mdlForm>InputTaxCode}" />
+                            <Text text="{mdlForm>WHT}" />
+                            <Text text="{mdlForm>ReceiverICOAdjGL}" />
+                            <Text text="{mdlForm>SummaryInvoiceIndicator}" />
+                            <Text text="{mdlForm>MarkupPercentage}" />
+                            <Text text="{mdlForm>MarkupGL}" />
+                            <Text text="{mdlForm>PostedDocumentNumberSCC}" />
+                            <Text text="{mdlForm>PostedDocumentFYSCC}" />
+                            <Text text="{mdlForm>PostedDocumentNumberRCC}" />
+                            <Text text="{mdlForm>PostedDocumentFYRCC}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="Close" icon="sap-icon://cancel" type="Reject" press="onPostTblDiagClose" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
