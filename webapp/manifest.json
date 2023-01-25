@@ -34,6 +34,20 @@
           "localUri": "annotations/annotation.xml"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "intent1": {
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          },
+          "semanticObject": "zfi_fiori_xjoa",
+          "action": "display",
+          "title": "XJOA Tax Adjustment Form",
+          "icon": "sap-icon://waiver"
+        }
+      }
     }
   },
   "sap.ui": {
