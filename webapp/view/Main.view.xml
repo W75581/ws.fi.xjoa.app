@@ -74,7 +74,13 @@
                         }" 
                     />
                     <Label text="{i18n>docNo}" />
-                    <Input id="idInpDocNo" value="{mdlForm>/FIDocumentNumber}"/>
+                    <!-- <MultiInput id="idInpDocNo" value="{mdlForm>/FIDocumentNumber}" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested"/> -->
+                    <MultiInput id="idMulInpDocNo" value="{FIDocumentNumber}" tokens="{path: 'mdlForm>/FIDocNoVal'}" name="FIDocumentNumber"
+                    tokenUpdate="onUpdateTokens" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested">
+                        <tokens>
+                            <Token key="{mdlForm>key}" text="{mdlForm>text}" />
+                        </tokens>
+                    </MultiInput>
                 </f:content>
             </f:SimpleForm>
             <HBox justifyContent="End" class="sapUiSmallMargin">

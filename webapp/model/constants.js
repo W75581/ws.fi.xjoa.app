@@ -4,7 +4,7 @@ sap.ui.define([], function () {
         "FORM_OBJECT": {
             "CompanyCode": [],
             "FICODocument": "FI",
-            "FIDocumentNumber": "",
+            "FIDocumentNumber": [],
             "Report": false
         },
         "COMPANY_CODE_PROP": "CompanyCode",

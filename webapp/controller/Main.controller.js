@@ -9,12 +9,13 @@ sap.ui.define([
 	'sap/m/Column',
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
+    'sap/ui/model/type/String',
     'ws/fi/xjoa/app/utils/Validator'
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, ColumnListItem, Label, Token, SearchField, MessageToast, UIColumn, MColumn, Filter, FilterOperator, Validator) {
+    function (Controller, ColumnListItem, Label, Token, SearchField, MessageToast, UIColumn, MColumn, Filter, FilterOperator, TypeString, Validator) {
         "use strict";
 
         return Controller.extend("ws.fi.xjoa.app.controller.Main", {
@@ -103,7 +104,13 @@ sap.ui.define([
                 var aFilters = [];
 
                 aKeys.forEach(function (sKey) {
-                    aFilters.push(new Filter(sProperty, FilterOperator.EQ, sKey));
+                    if (!sKey.hasOwnProperty("keyField")) {
+                        aFilters.push(new Filter(sProperty, FilterOperator.EQ, sKey));
+                    }
+                    else {
+                        //for definitions
+                        aFilters.push(new Filter(sKey.keyField, FilterOperator[sKey.operation], sKey.value1, sKey.value2));
+                    }  
                 });
 
                 if (aFilters && aFilters.length > 0) {
@@ -137,12 +144,11 @@ sap.ui.define([
                     aFilters.push(new Filter("Period", FilterOperator.EQ, value));
                 });
 
-                aFilters.push(new Filter("PostingDate", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["POSTING_DATE_PROP"])));
-                aFilters.push(new Filter("DocumentDate", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["DOCUMENT_DATE_PROP"])));
                 aFilters.push(new Filter("FICODocument", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["POSTING_TYPE_PROP"])));
 
-                // aFilters.push(new Filter("FIDocumentNumber", FilterOperator.Contains, this._oFormMdl.getProperty("/" + this._oConstant["DOCUMENT_NO_PROP"])));
-
+                var aDocumentNoFilter = this._getFilter(this._oConstant["DOCUMENT_NO_PROP"]);
+                if (aDocumentNoFilter) aFilters.push(aDocumentNoFilter);
+                
                 if (this._bSimulate === true) {
                     var bReport = this._oFormMdl.getProperty("/" + this._oConstant["REPORT_PROP"]);
                     if (bReport === true) {
@@ -154,6 +160,8 @@ sap.ui.define([
                     aFilters.push(new Filter("Report", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["REPORT_PROP"])));
                 }
                 else {
+                    aFilters.push(new Filter("PostingDate", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["POSTING_DATE_PROP"])));
+                    aFilters.push(new Filter("DocumentDate", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["DOCUMENT_DATE_PROP"])));
                     aFilters.push(new Filter("Test", FilterOperator.EQ, false));
                     aFilters.push(new Filter("Report", FilterOperator.EQ, false));
                 }
@@ -190,6 +198,15 @@ sap.ui.define([
                         return;
                     }
                     this.getView().addDependent(oDialog);
+
+                    oDialog.setRangeKeyFields([{
+                        label: "Company Code",
+                        key: "CompanyCode",
+                        type: "string",
+                        typeInstance: new TypeString({}, {
+                            maxLength: 7
+                        })
+                    }]);
     
                     // Set Basic Search for FilterBar
                     oFilterBar.setFilterBarExpanded(false);
@@ -257,7 +274,15 @@ sap.ui.define([
                 this._oMultiInput.setTokens(aTokens);
                 var sTitle = oEvent.getSource().getTitle().replace(/\s+/g, '');
                 var aKeys = [];
-                aTokens.map((oToken) => { aKeys.push(oToken.getKey()); });
+                aTokens.map((oToken) => { 
+                    if (oToken.data("range") === null) {
+                        aKeys.push(oToken.getKey()); 
+                    }
+                    else {
+                        oToken.data("range").key = oToken.getKey();
+                        aKeys.push(oToken.data("range")); 
+                    }
+                });
                 this._oFormMdl.setProperty("/" + sTitle, aKeys);
 
                 this._oVHD.close();
@@ -270,6 +295,65 @@ sap.ui.define([
             onValueHelpCancelPress: function () {
                 this._oVHD.close();
             },
+
+            /**
+             * Handles when user selects the Value Help for 
+             * @param {sap.ui.base.Event} oEvent from the multi-input
+             * @public
+             */
+            onMultipleConditionsVHRequested: function(oEvent) {
+                this._oMultipleConditionsInput = oEvent.getSource();
+                if (!this.pMultipleConditionsDialog) {
+                    this.pMultipleConditionsDialog = this.loadFragment({
+                        name: "ws.fi.xjoa.app.view.fragments.DocumentNoVH"
+                    });
+                }
+                this.pMultipleConditionsDialog.then(function(oMultipleConditionsDialog) {
+                    if (this._bMultipleConditionsInitialized) {
+                        oMultipleConditionsDialog.setTokens([]);
+                        oMultipleConditionsDialog.setTokens(this._oMultipleConditionsInput.getTokens());
+                        oMultipleConditionsDialog.update();
+
+                        oMultipleConditionsDialog.open();
+                        return;
+                    }
+                    this._oMultipleConditionsDialog = oMultipleConditionsDialog;
+                    this.getView().addDependent(oMultipleConditionsDialog);
+                    oMultipleConditionsDialog.setRangeKeyFields([{
+                        label: "Document No",
+                        key: "FIDocumentNumber",
+                        type: "string",
+                        typeInstance: new TypeString({}, {
+                            maxLength: 7
+                        })
+                    }]);
+    
+                    oMultipleConditionsDialog.setTokens(this._oMultipleConditionsInput.getTokens());
+                    this._bMultipleConditionsInitialized = true;
+                    oMultipleConditionsDialog.open();
+                }.bind(this));
+            },
+
+            /**
+             * Called to set the conditions as tokens and close the Value Help dialog.
+             * @param {sap.ui.base.Event} oEvent from the ok button
+             * @public
+             */
+            onMultipleConditionsValueHelpOkPress: function (oEvent) {
+                var aTokens = oEvent.getParameter("tokens");
+                this._oMultipleConditionsInput.setTokens(aTokens);
+                this._oFormMdl.setProperty("/FIDocumentNumber", aTokens);    
+                this._oMultipleConditionsDialog.close();
+            },
+
+             /**
+             * Called to close the Value Help dialog for Document No.
+             * @public
+             */
+            onMultipleConditionsCancelPress: function () {
+                this._oMultipleConditionsDialog.close();
+            },
+
             /**
              * Handles when user uses the search functionality 
              * from the Value Help Dialog 
@@ -333,11 +417,26 @@ sap.ui.define([
                 var oMultiInput = oEvent.getSource();
                 var oProperties = {};
                 oProperties[this._oConstant["COMPANY_CODE_PROP"]] = this._oConstant["COMPANY_CODE_PROP"];
+                oProperties[this._oConstant["DOCUMENT_NO_PROP"]] = this._oConstant["DOCUMENT_NO_PROP"];
 
                 var sProperty = oProperties[oMultiInput.getName()];
                 if (oEvent.getParameter("type") === "removed") {
+                    var iIndex;
                     var aKeys = this._oFormMdl.getProperty("/" + sProperty);
-                    var iIndex = aKeys.indexOf(oToken.getKey());
+                    if (oToken.data("range") === null) {
+                        iIndex = aKeys.indexOf(oToken.getKey());
+                    }
+                    else {
+                        var oDialog;
+                        iIndex = aKeys.findIndex(object => { return object.key === oToken.getKey()});
+                        if (sProperty === this._oConstant["COMPANY_CODE_PROP"]) {
+                            oDialog = this._oVHD;
+                        }
+                        else {
+                            oDialog = this._oMultipleConditionsDialog;
+                        }
+                        oDialog._oFilterPanel._oConditionPanel.removeCondition(oToken.getKey().replace("range", "condition"));
+                    }
                     if (iIndex >= 0) aKeys.splice(iIndex, 1);
                 }
             },
@@ -432,8 +531,11 @@ sap.ui.define([
                 this._clearControl("idComboBxFisYr", this._oConstant["FISCAL_YEAR_PROP"]);
                 this._clearControl("idComboBxFisYrPrd", this._oConstant["FISCAL_PERIOD_PROP"]);
                 this._clearControl("idRBGPostType", this._oConstant["POSTING_TYPE_PROP"]);
-                this._clearControl("idInpDocNo", this._oConstant["DOCUMENT_NO_PROP"]);
+                this._clearControl("idMulInpDocNo", this._oConstant["DOCUMENT_NO_PROP"]);
                 this._setDefaultPstDate();
+
+                this._oVHD._oFilterPanel._oConditionPanel.setConditions([]);
+                this._oMultipleConditionsDialog._oFilterPanel._oConditionPanel.setConditions([]);
             },
 
             /**
