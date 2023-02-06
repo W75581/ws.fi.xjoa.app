@@ -1,94 +1,94 @@
-_schema-version: "3.2"
+_schema-version: '3.2'
 ID: ws-fi-xjoa-app
-description: A Fiori application.
+description: XJOA Tax Adjustment Form
 version: 0.0.1
 modules:
-- name: ws-fi-xjoa-app-destination-content
-  type: com.sap.application.content
-  requires:
-  - name: ws-fi-xjoa-app-destination-service
-    parameters:
-      content-target: true
-  - name: ws-fi-xjoa-app-repo-host
-    parameters:
-      service-key:
-        name: ws-fi-xjoa-app-repo-host-key
-  - name: ws-fi-xjoa-app-uaa
-    parameters:
-      service-key:
-        name: ws-fi-xjoa-app-uaa-key
-  parameters:
-    content:
-      instance:
-        destinations:
-        - Name: ws-fi-xjoa-app_html_repo_host
-          ServiceInstanceName: ws-fi-xjoa-app-html5-srv
-          ServiceKeyName: ws-fi-xjoa-app-repo-host-key
-          sap.cloud.service: ws-fi-xjoa-app
-        - Authentication: OAuth2UserTokenExchange
-          Name: ws-fi-xjoa-app_uaa
-          ServiceInstanceName: ws-fi-xjoa-app-xsuaa-srv
-          ServiceKeyName: ws-fi-xjoa-app-uaa-key
-          sap.cloud.service: ws-fi-xjoa-app
-        existing_destinations_policy: ignore
-  build-parameters:
-    no-source: true
-- name: ws-fi-xjoa-app-app-content
-  type: com.sap.application.content
-  path: .
-  requires:
-  - name: ws-fi-xjoa-app-repo-host
-    parameters:
-      content-target: true
-  build-parameters:
-    build-result: resources
+  - name: ws-fi-xjoa-app-destination-content
+    type: com.sap.application.content
     requires:
-    - artifacts:
-      - wsfixjoaapp.zip
-      name: wsfixjoaapp
-      target-path: resources/
-- name: wsfixjoaapp
-  type: html5
-  path: .
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
-resources:
-- name: ws-fi-xjoa-app-destination-service
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: true
-      init_data:
+      - name: ws-fi-xjoa-app-destination-service
+        parameters:
+          content-target: true
+      - name: ws-fi-xjoa-app-repo-host
+        parameters:
+          service-key:
+            name: ws-fi-xjoa-app-repo-host-key
+      - name: ws-fi-xjoa-app-uaa
+        parameters:
+          service-key:
+            name: ws-fi-xjoa-app-uaa-key
+    parameters:
+      content:
         instance:
           destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          existing_destinations_policy: update
-      version: 1.0.0
-    service: destination
-    service-name: ws-fi-xjoa-app-destination-service
-    service-plan: lite
-- name: ws-fi-xjoa-app-uaa
-  type: org.cloudfoundry.managed-service
-  parameters:
-    path: ./xs-security.json
-    service: xsuaa
-    service-name: ws-fi-xjoa-app-xsuaa-srv
-    service-plan: application
-- name: ws-fi-xjoa-app-repo-host
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-name: ws-fi-xjoa-app-html5-srv
-    service-plan: app-host
+            - Name: ws-fi-xjoa-app_html_repo_host
+              ServiceInstanceName: ws-fi-xjoa-app-html5-srv
+              ServiceKeyName: ws-fi-xjoa-app-repo-host-key
+              sap.cloud.service: ws-fi-xjoa-app
+            - Authentication: OAuth2UserTokenExchange
+              Name: ws-fi-xjoa-app_uaa
+              ServiceInstanceName: ws-fi-xjoa-app-xsuaa-srv
+              ServiceKeyName: ws-fi-xjoa-app-uaa-key
+              sap.cloud.service: ws-fi-xjoa-app
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
+  - name: ws-fi-xjoa-app-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: ws-fi-xjoa-app-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - wsfixjoaapp.zip
+          name: wsfixjoaapp
+          target-path: resources/
+  - name: wsfixjoaapp
+    type: html5
+    path: .
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - 'npm run build:cf'
+      supported-platforms: []
+resources:
+  - name: ws-fi-xjoa-app-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: 'https://ui5.sap.com'
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: ws-fi-xjoa-app-destination-service
+      service-plan: lite
+  - name: ws-fi-xjoa-app-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: ws-fi-xjoa-app-xsuaa-srv
+      service-plan: application
+  - name: ws-fi-xjoa-app-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: ws-fi-xjoa-app-html5-srv
+      service-plan: app-host
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
