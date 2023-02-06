@@ -1,7 +1,7 @@
 _schema-version: '3.2'
 ID: ws-fi-xjoa-app
 description: XJOA Tax Adjustment Form
-version: 0.0.1
+version: 1.0.0
 modules:
   - name: ws-fi-xjoa-app-destination-content
     type: com.sap.application.content
