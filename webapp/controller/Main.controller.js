@@ -1,21 +1,31 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
-    'sap/m/ColumnListItem',
-    'sap/m/Label',
-    'sap/m/Token',
-    'sap/m/SearchField',
-    'sap/m/MessageToast',
-    'sap/ui/table/Column',
-	'sap/m/Column',
-    'sap/ui/model/Filter',
-    'sap/ui/model/FilterOperator',
-    'sap/ui/model/type/String',
-    'ws/fi/xjoa/app/utils/Validator'
+    "sap/ui/core/util/File",
+    "sap/ui/model/json/JSONModel",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/model/type/String",
+    "sap/ui/table/Column",
+    "sap/m/Column",
+    "sap/m/ColumnListItem",
+    "sap/m/Label",
+    "sap/m/Token",
+    "sap/m/SearchField",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
+    "sap/m/PDFViewer",
+    "sap/base/security/URLListValidator",
+    "ws/fi/xjoa/app/utils/Validator"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, ColumnListItem, Label, Token, SearchField, MessageToast, UIColumn, MColumn, Filter, FilterOperator, TypeString, Validator) {
+    function (Controller, FileUtil,
+        JSONModel, Filter, FilterOperator, TypeString,
+        UIColumn,
+        MColumn, ColumnListItem, Label, Token, SearchField, MessageToast, MessageBox, PDFViewer,
+        URLListValidator,
+        Validator) {
         "use strict";
 
         return Controller.extend("ws.fi.xjoa.app.controller.Main", {
@@ -29,15 +39,27 @@ sap.ui.define([
              * @public
              */
              onInit: function () {
-                this._oConstant = this.getOwnerComponent() ? this.getOwnerComponent().getModel("constant").getData() : undefined;
-                this._oModel = this.getOwnerComponent().getModel();
+                URLListValidator.add("blob");
+
+                var oComponent = this.getOwnerComponent();
+                this._oConstant = oComponent ? oComponent.getModel("constant").getData() : undefined;
+                this._oModel = oComponent.getModel();
 
                 var oFormObject = this._oConstant["FORM_OBJECT"];
-                var oModel = new sap.ui.model.json.JSONModel(oFormObject);
+                var oModel = new JSONModel(oFormObject);
                 this.getView().setModel(oModel,"mdlForm");
                 this._oFormMdl = this.getView().getModel("mdlForm");
-                this._bSimulate = true;
                 this._setDefaultPstDate();
+
+                this._oSmartTable = this.byId("idMainTable");
+            },
+
+            /**
+             * Called when the worklist controller is destroyed.
+             * @public
+             */
+            onExit: function () {
+                URL.revokeObjectURL(this._oPDFURI);
             },
 
             /**
@@ -87,14 +109,6 @@ sap.ui.define([
             },
 
             /**
-             * Gets smart table instance
-             * @private
-             */
-             _getSmartTableById: function () {
-                return this.getView().byId("idMainTable");
-            },
-
-            /**
              * Generic method for getting model values as filters
              * @private
              * @returns {sap.ui.model.Filter} Filter object representing the filter
@@ -138,18 +152,10 @@ sap.ui.define([
                 if (aCompanyCodeFilter) aFilters.push(aCompanyCodeFilter);
 
                 aFilters.push(new Filter("FiscalYear", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["FISCAL_YEAR_PROP"])));
-
-                var aPeriodKeys = this._oFormMdl.getProperty("/" + this._oConstant["FISCAL_PERIOD_PROP"]);
-                aPeriodKeys.forEach((value) => {
-                    aFilters.push(new Filter("Period", FilterOperator.EQ, value));
-                });
-
+                aFilters.push(new Filter("Period", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["FISCAL_PERIOD_PROP"])));
                 aFilters.push(new Filter("FICODocument", FilterOperator.EQ, this._oFormMdl.getProperty("/" + this._oConstant["POSTING_TYPE_PROP"])));
 
-                var aDocumentNoFilter = this._getFilter(this._oConstant["DOCUMENT_NO_PROP"]);
-                if (aDocumentNoFilter) aFilters.push(aDocumentNoFilter);
-                
-                if (this._bSimulate === true) {
+                if (this._oFormMdl.getProperty("/Simulate") === true) {
                     var bReport = this._oFormMdl.getProperty("/" + this._oConstant["REPORT_PROP"]);
                     if (bReport === true) {
                         aFilters.push(new Filter("Test", FilterOperator.EQ, false));
@@ -435,7 +441,10 @@ sap.ui.define([
                         else {
                             oDialog = this._oMultipleConditionsDialog;
                         }
-                        oDialog._oFilterPanel._oConditionPanel.removeCondition(oToken.getKey().replace("range", "condition"));
+
+                        if (oDialog &&
+                            oDialog._oFilterPanel &&
+                            oDialog._oFilterPanel._oConditionPanel) oDialog._oFilterPanel._oConditionPanel.removeCondition(oToken.getKey().replace("range", "condition"));
                     }
                     if (iIndex >= 0) aKeys.splice(iIndex, 1);
                 }
@@ -470,21 +479,6 @@ sap.ui.define([
                 }
             },
 
-            /**
-             * Apply Fiscal Year to Fiscal Year Period as filter.
-             * @public
-             * @param {sap.ui.base.Event} oEvent from the combobox
-             */
-            onSelFiscalYear: function(oEvent) {
-                var aFilters = [];
-                var sFilterValue = oEvent.getSource().getSelectedKey();
-                var oFisYrPrd = this.getView().byId("idComboBxFisYrPrd");
-                var oBinding = oFisYrPrd.getBinding("items");
-                if (sFilterValue){
-                    aFilters.push( new Filter("FiscalYear", FilterOperator.EQ, sFilterValue) );
-                }
-                oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
-            },
 
             /**
              * Updates the selected Posting Type.
@@ -518,8 +512,8 @@ sap.ui.define([
                     return;
                 }
 
-                this._bSimulate = true;
-                this._getSmartTableById().rebindTable();
+                this._oFormMdl.setProperty("/Simulate", true);
+                this._oSmartTable.rebindTable();
             },
 
             /**
@@ -531,11 +525,17 @@ sap.ui.define([
                 this._clearControl("idComboBxFisYr", this._oConstant["FISCAL_YEAR_PROP"]);
                 this._clearControl("idComboBxFisYrPrd", this._oConstant["FISCAL_PERIOD_PROP"]);
                 this._clearControl("idRBGPostType", this._oConstant["POSTING_TYPE_PROP"]);
+                this._clearControl("idCBRprtOnly", this._oConstant["REPORT_PROP"]);
                 this._clearControl("idMulInpDocNo", this._oConstant["DOCUMENT_NO_PROP"]);
                 this._setDefaultPstDate();
 
-                this._oVHD._oFilterPanel._oConditionPanel.setConditions([]);
-                this._oMultipleConditionsDialog._oFilterPanel._oConditionPanel.setConditions([]);
+                if (this._oVHD &&
+                    this._oVHD._oFilterPanel &&
+                    this._oVHD._oFilterPanel._oConditionPanel) this._oVHD._oFilterPanel._oConditionPanel.setConditions([]);
+                
+                if (this._oMultipleConditionsDialog &&
+                    this._oMultipleConditionsDialog._oFilterPanel &&
+                    this._oMultipleConditionsDialog._oFilterPanel._oConditionPanel) this._oMultipleConditionsDialog._oFilterPanel._oConditionPanel.setConditions([]);
             },
 
             /**
@@ -565,6 +565,10 @@ sap.ui.define([
                     case "sap.m.MultiInput":
                         oControl.removeAllTokens();
                         this._oFormMdl.setProperty("/" + sProperty, []);
+                        break;
+                    case "sap.m.CheckBox":
+                        this._oFormMdl.setProperty("/" + sProperty, false);
+                        break;
                 }
             },
 
@@ -574,10 +578,29 @@ sap.ui.define([
              * @param {sap.ui.base.Event} oEvent from the smart filter table
              */
              onBeforeRebindTable: function(oEvent) {
-                this._getSmartTableById().getTable().removeSelections();
                 var oBindingParams = oEvent.getParameter("bindingParams");
-                var aFilters = this._getFilters();
-                oBindingParams.filters = aFilters;
+                oBindingParams.filters = this._getFilters();
+
+                this._oFormMdl.setProperty("/Busy", true);
+                this._oFormMdl.setProperty("/ShowFooter", false);
+                this._oFormMdl.setProperty("/PrintOut", false);
+                this._addBindingListener(oBindingParams, "dataReceived", this._onDataReceived.bind(this));
+            },
+
+            /**
+             * Handles dataReceived event of SmartTable
+             * @private
+             * @param {sap.ui.base.Event} oEvent
+             */
+            _onDataReceived: function (oEvent) {
+                var iDataLength = oEvent.getParameter("data")["results"].length;
+                this._oFormMdl.setProperty("/Busy", false);
+                
+                if(this._oFormMdl.getProperty("/Simulate") && !this._oFormMdl.getProperty("/Report") && iDataLength > 0) {
+                    this._oFormMdl.setProperty("/ShowFooter", true);
+                } else if (iDataLength > 0) {
+                    this._oFormMdl.setProperty("/PrintOut", true);
+                }
             },
 
             /**
@@ -585,15 +608,114 @@ sap.ui.define([
              * @public
              */
              onConfirmPost: function() {
-                this._bSimulate = false;
-                var aItems = this._getSmartTableById().getTable().getItems();
-                
-                if (aItems.length < 1) {
-                    MessageToast.show(this._getResourceText("saveErrMessage"));
-                    return;
+                MessageBox.confirm(this._getResourceText("confirmPosting"), {
+                    onClose: (oAction) => {
+                        if (oAction === MessageBox.Action.YES) {
+                            this._oFormMdl.setProperty("/Simulate", false);
+                            this._oSmartTable.rebindTable();
+                        }
+                    },
+                    actions: [
+                        MessageBox.Action.YES,
+                        MessageBox.Action.NO
+                    ],
+                    emphasizedAction: MessageBox.Action.NO
+                });
+            },
+
+            onPDFDisplay: function () {
+                var aFilters = [];
+
+                this._getFilters().forEach((oFilter) => {
+                    switch (oFilter.getPath()) {
+                        case "CompanyCode":
+                        case "FiscalYear":
+                        case "Period":
+                        case "":
+                            aFilters.push(oFilter);
+                            break;
+                    }
+                });
+
+                var aDocumentNoFilter = this._getFilter(this._oConstant["DOCUMENT_NO_PROP"]);
+                if (aDocumentNoFilter) aFilters.push(aDocumentNoFilter);
+
+                if (aFilters && aFilters.length > 0) {
+                    this._oFormMdl.setProperty("/Busy", true);
+
+                    this._oModel.read("/PrintOut", {
+                        filters: aFilters,
+                        success: (oData) => {
+                            if (oData && oData.results && oData.results.length > 0) {
+                                this._displayPDF(oData.results[0]); //expecting only a single response
+                                this._oFormMdl.setProperty("/Busy", false);
+                            }
+                        },
+                        error: (oError) => {
+                            this._oFormMdl.setProperty("/Busy", false);
+                            console.log(oError);
+                        }
+                    });
+                }
+            },
+
+            /**
+             * Display generated PDF from backend.
+             * @private
+             * @param {Object} oData Data representing PDF response from backend
+             */
+            _displayPDF: function (oData) {
+                var oPDFCode = null;
+                var byteArray = null;
+                var arrFileName = this._getFileNameArray(oData.FileName);
+
+                if (oData.PDF) {
+                    oPDFCode = window.atob(oData.PDF);
+                    byteArray = new Uint8Array(oPDFCode.length);
+
+                    for(var i=0; i<oPDFCode.length; i++) {
+                        byteArray[i] = oPDFCode.charCodeAt(i);
+                    }
+
+                    var oBlob = new Blob([byteArray.buffer], { type: oData.MimeType } );
+                    if (this._oPDFURI) URL.revokeObjectURL(this._oPDFURI);
+                    this._oPDFURI = URL.createObjectURL(oBlob);
+
+                    if (!this._oPDFViewer) this._oPDFViewer = new PDFViewer({ width: "auto" });
+                    this._oPDFViewer.setSource(this._oPDFURI);
+                    this._oPDFViewer.setErrorPlaceholderMessage(oData.Message);
+
+                    this._oPDFViewer.downloadPDF = () => {
+                        FileUtil.save(
+                            byteArray.buffer,
+                            arrFileName[0],
+                            arrFileName[1],
+                            oData.MimeType
+                        );
+                    };
+
+                    this._oPDFViewer.open();
+                } else {
+                    MessageBox.warning(oData.Message);
+                }
+            },
+
+            /**
+             * Splits a filename string as an array
+             * @private
+             * @param {string} sFileName Filename string with extension
+             * @returns {Array} Array of containing file name [0] and extension [1]
+             */
+            _getFileNameArray: function (sFileName) {
+                var arrFileNameParts = ["Dummy", "pdf"];
+                var iExtSeparator = sFileName.lastIndexOf(".");
+
+                if (iExtSeparator > 0) { //dot is not at the beginning of the string
+                    arrFileNameParts[0] = (sFileName.substring(0, iExtSeparator)); //FileName
+                    arrFileNameParts[1] = (sFileName.substring((iExtSeparator + 1), sFileName.length)); //Extension
                 }
 
-                this._getSmartTableById().rebindTable();
+                return arrFileNameParts;
             },
 
             /**
@@ -604,6 +726,30 @@ sap.ui.define([
             onNavBack: function () {
                 // eslint-disable-next-line sap-no-history-manipulation
                 history.go(-1);
+            },
+
+            /**
+             * Event handler for data Received/Requested post sapui5 1.56.
+             * Referenced from https://blogs.sap.com/2019/11/04/handle-datareceived-event-in-smart-table-after-version-1.56-in-sapui5/
+             * @private
+             * @param {Object} oBindingInfo Binding information from calling event
+             * @param {string} sEventName Name of Event to Handle
+             * @param {function} fHandler Function to execute if the event is triggered
+             */
+            _addBindingListener: function (oBindingInfo, sEventName, fHandler) {
+                oBindingInfo.events = oBindingInfo.events || {};
+
+                if (!oBindingInfo.events[sEventName]) {
+                    oBindingInfo.events[sEventName] = fHandler;
+                } else {
+                    // Wrap the event handler of the other party to add our handler.
+                    var fOriginalHandler = oBindingInfo.events[sEventName];
+                    oBindingInfo.events[sEventName] = function() {
+                        fHandler.apply(this, arguments);
+                        fOriginalHandler.apply(this, arguments);
+                    };
+                }
             }
+
         });
     });

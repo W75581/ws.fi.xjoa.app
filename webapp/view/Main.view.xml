@@ -2,18 +2,26 @@
     controllerName="ws.fi.xjoa.app.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
+    height="100%"
     xmlns="sap.m"
+    xmlns:semantic="sap.f.semantic"
     xmlns:l="sap.ui.layout"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
-    xmlns:smartTable="sap.ui.comp.smarttable"
-    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
->
-    <Page id="page" title="{i18n>title}">
-        <content>
-            <f:SimpleForm id="idMainForm" class="sapUiSmallMarginEnd" editable="true" layout="ResponsiveGridLayout" labelSpanXL="2" labelSpanL="4" labelSpanM="12" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" columnsXL="2" columnsL="2" columnsM="1" singleContainerFullSize="false">
+    xmlns:table="sap.ui.table"
+    xmlns:smartTable="sap.ui.comp.smarttable">
+
+    <semantic:SemanticPage showFooter="{mdlForm>/ShowFooter}" busy="{mdlForm>/Busy}" busyIndicatorDelay="0"
+		titleAreaShrinkRatio="1.6:1:1.6">
+
+        <semantic:titleHeading>
+            <Title text="{i18n>title}" />
+        </semantic:titleHeading>
+
+        <semantic:headerContent>
+            <f:SimpleForm id="idMainForm" editable="true" layout="ColumnLayout" class="sapUiTinyMarginTopBottom">
                 <f:content>
-                    <core:Title text="" />
+
                     <Label text="{i18n>companyCode}" required="true"/>
                     <MultiInput id="idMulInpCompCode" required="true" value="{CompanyCode}" tokens="{path: 'mdlForm>/CompanyCodeVal'}" name="CompanyCode" suggestionRows="{/I_CompanyCode}"
                     tokenUpdate="onUpdateTokens" valueHelpRequest="onValueHelpRequested" suggestionItemSelected="onSuggestedItemSelected">
@@ -35,24 +43,32 @@
                             </ColumnListItem>
                         </suggestionRows>
                     </MultiInput>
+
                     <Label text="{i18n>periodFisYr}" />
-                    <ComboBox required="true" id="idComboBxFisYr" selectionChange="onSelFiscalYear" selectedKey="{mdlForm>/FiscalYear}" items="{path: '/I_FiscalYear'}">
+                    <ComboBox required="true" id="idComboBxFisYr" selectedKey="{mdlForm>/FiscalYear}" items="{path: '/ZFI_IQ_FISCAL_YEAR'}">
                         <core:ListItem key="{FiscalYear}" text="{FiscalYear}" />
                         <layoutData>
-                            <l:GridData span="XL4 L4 M4 S4" />
+                            <f:ColumnElementData cellsLarge="4" cellsSmall="6" />
                         </layoutData>
                     </ComboBox>
-                    <MultiComboBox required="true" id="idComboBxFisYrPrd" selectedKeys="{mdlForm>/Period}" items="{path: '/I_FiscalYearPeriod'}">
+                    <ComboBox required="true" id="idComboBxFisYrPrd" selectedKey="{mdlForm>/Period}" items="{path: '/ZFI_IQ_FY_PERIOD'}">
                         <core:ListItem key="{FiscalPeriod}" text="{FiscalPeriod}" />
-                    </MultiComboBox>
+                    </ComboBox>
+
+                    <Label text="{i18n>docNo}" />
+                    <MultiInput id="idMulInpDocNo" value="{FIDocumentNumber}" tokens="{path: 'mdlForm>/FIDocNoVal'}" name="FIDocumentNumber"
+                    tokenUpdate="onUpdateTokens" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested">
+                        <tokens>
+                            <Token key="{mdlForm>key}" text="{mdlForm>text}" />
+                        </tokens>
+                    </MultiInput>
+
                     <Label text="{i18n>postType}" />
                     <RadioButtonGroup id="idRBGPostType" columns="2" select="selectPostType">
                         <RadioButton text="{i18n>radioFI}" class="sapUiMediumMarginEnd" selected="true" />
                         <RadioButton text="{i18n>radioCO}" />
                     </RadioButtonGroup>
-                    <Label text="{i18n>reportOnly}" />
-                    <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" />
-                    <core:Title text="" />
+
                     <Label text="{i18n>postDate}" />
                     <DatePicker id="idMulInpPstDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" 
                         value="{
@@ -63,6 +79,7 @@
                             }
                         }" 
                     />
+
                     <Label text="{i18n>docDate}" />
                     <DatePicker id="idMulInpDocDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" 
                         value="{
@@ -73,28 +90,26 @@
                             }
                         }" 
                     />
-                    <Label text="{i18n>docNo}" />
-                    <!-- <MultiInput id="idInpDocNo" value="{mdlForm>/FIDocumentNumber}" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested"/> -->
-                    <MultiInput id="idMulInpDocNo" value="{FIDocumentNumber}" tokens="{path: 'mdlForm>/FIDocNoVal'}" name="FIDocumentNumber"
-                    tokenUpdate="onUpdateTokens" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested">
-                        <tokens>
-                            <Token key="{mdlForm>key}" text="{mdlForm>text}" />
-                        </tokens>
-                    </MultiInput>
+
+                    <Label text="{i18n>reportOnly}" />
+                    <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" />
+
                 </f:content>
             </f:SimpleForm>
-            <HBox justifyContent="End" class="sapUiSmallMargin">
-                <Button text="{i18n>simulate}" class="sapUiSmallMarginEnd" type="Emphasized" press="onSimulateForm" />
+            <HBox alignItems="Start" justifyContent="End" class="sapUiTinyMarginTopBottom">
+				<Button text="{i18n>simulate}" class="sapUiSmallMarginEnd" type="Emphasized" press="onSimulateForm" />
                 <Button text="{i18n>clear}" type="Transparent" press="onClearForm" />
-            </HBox>
+			</HBox>
+        </semantic:headerContent>
+
+        <semantic:content>
             <smartTable:SmartTable
                 class="sapUiSmallMargin"
                 id="idMainTable"
                 entitySet="Adjustment"
                 tableType="Table"
-                enableExport="true"
                 beforeExport="onBeforeExport"
-                useTablePersonalisation="true"
+                useTablePersonalisation="false"
                 header="Items"
                 showRowCount="true"
                 showVariantManagement="false"
@@ -102,14 +117,21 @@
                 enableAutoColumnWidth="true"
                 beforeRebindTable="onBeforeRebindTable"
                 initialNoDataText="{i18n>initialNoDataText}">
-                <Table sticky="ColumnHeaders" popinLayout="GridSmall" alternateRowColors="true" selectionChange="handleItemSelection" rememberSelections="false" />
+
+                <smartTable:customToolbar>
+                    <OverflowToolbar design="Transparent">
+                        <ToolbarSpacer />
+                        <OverflowToolbarButton  tooltip="{i18n>printOut}" icon="sap-icon://pdf-attachment" enabled="{mdlForm>/PrintOut}" />
+                    </OverflowToolbar>
+                </smartTable:customToolbar>
+
+                <table:Table alternateRowColors="true" selectionMode="None" threshold="0" />
             </smartTable:SmartTable>
-        </content>
-        <footer>
-			<OverflowToolbar visible="{=!${mdlForm>/Report}}">
-				<ToolbarSpacer/>
-				<Button type="Emphasized" text="{i18n>confirmPost}" press="onConfirmPost"/>
-			</OverflowToolbar>
-		</footer>
-    </Page>
+        </semantic:content>
+
+        <semantic:footerMainAction>
+            <semantic:FooterMainAction text="{i18n>confirmPost}" press="onConfirmPost" enabled="{mdlForm>/ShowFooter}" />
+        </semantic:footerMainAction>
+
+    </semantic:SemanticPage>
 </mvc:View>
