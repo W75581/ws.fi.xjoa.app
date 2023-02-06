@@ -627,11 +627,19 @@ sap.ui.define([
                 var aFilters = [];
 
                 this._getFilters().forEach((oFilter) => {
-                    switch (oFilter.getPath()) {
+                    var sPath = oFilter.getPath();
+
+                    if (oFilter && !sPath) { //means it is possibly a range
+                        var aInFilters = oFilter.getFilters();
+                        if (aInFilters && aInFilters.length > 0) {
+                            sPath = aInFilters[0].getPath();
+                        }
+                    }
+
+                    switch (sPath) {
                         case "CompanyCode":
                         case "FiscalYear":
                         case "Period":
-                        case "":
                             aFilters.push(oFilter);
                             break;
                     }
