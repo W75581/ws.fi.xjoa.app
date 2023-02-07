@@ -505,7 +505,7 @@ sap.ui.define([
              * @public
              */
              onSimulateForm: function () {
-                if (!this._getValidator().validate(this.getView().byId("idMainForm"))) {
+                if (!this._getValidator().validate(this.byId("idMainForm"))) {
                     MessageToast.show(this._getResourceText("validationMessage"), {
                         closeOnBrowserNavigation: false
                     });

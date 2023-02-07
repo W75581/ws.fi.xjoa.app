@@ -121,11 +121,12 @@
                 <smartTable:customToolbar>
                     <OverflowToolbar design="Transparent">
                         <ToolbarSpacer />
-                        <OverflowToolbarButton  tooltip="{i18n>printOut}" icon="sap-icon://pdf-attachment" enabled="{mdlForm>/PrintOut}" />
+                        <OverflowToolbarButton  tooltip="{i18n>printOut}" icon="sap-icon://pdf-attachment" enabled="{mdlForm>/PrintOut}"
+                            press="onPDFDisplay" />
                     </OverflowToolbar>
                 </smartTable:customToolbar>
 
-                <table:Table alternateRowColors="true" selectionMode="None" threshold="0" />
+                <table:Table alternateRowColors="true" selectionMode="None" threshold="0" visibleRowCountMode="Auto" />
             </smartTable:SmartTable>
         </semantic:content>
 
