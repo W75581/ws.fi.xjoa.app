@@ -52,25 +52,22 @@
                         </layoutData>
                     </ComboBox>
                     <ComboBox required="true" id="idComboBxFisYrPrd" selectedKey="{mdlForm>/Period}" items="{path: '/ZFI_IQ_FY_PERIOD'}">
-                        <core:ListItem key="{FiscalPeriod}" text="{FiscalPeriod}" />
+                        <core:ListItem key="{FiscalPeriod}" text="{ path: 'FiscalPeriod', formatter: '.removeLeadingZeroes' }" />
                     </ComboBox>
 
-                    <Label text="{i18n>docNo}" />
+                    <Label text="{i18n>reportOnly}" />
+                    <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" />
+
+                    <!-- <Label text="{i18n>docNo}" />
                     <MultiInput id="idMulInpDocNo" value="{FIDocumentNumber}" tokens="{path: 'mdlForm>/FIDocNoVal'}" name="FIDocumentNumber"
                     tokenUpdate="onUpdateTokens" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested">
                         <tokens>
                             <Token key="{mdlForm>key}" text="{mdlForm>text}" />
                         </tokens>
-                    </MultiInput>
-
-                    <Label text="{i18n>postType}" />
-                    <RadioButtonGroup id="idRBGPostType" columns="2" select="selectPostType">
-                        <RadioButton text="{i18n>radioFI}" class="sapUiMediumMarginEnd" selected="true" />
-                        <RadioButton text="{i18n>radioCO}" />
-                    </RadioButtonGroup>
+                    </MultiInput> -->
 
                     <Label text="{i18n>postDate}" />
-                    <DatePicker id="idMulInpPstDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" 
+                    <DatePicker id="idMulInpPstDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" enabled="{= !${mdlForm>/Report} }"
                         value="{
                             'type': 'sap.ui.model.type.Date',
                             'path': 'mdlForm>/PostingDate',
@@ -81,7 +78,7 @@
                     />
 
                     <Label text="{i18n>docDate}" />
-                    <DatePicker id="idMulInpDocDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" 
+                    <DatePicker id="idMulInpDocDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" enabled="{= !${mdlForm>/Report} }"
                         value="{
                             'type': 'sap.ui.model.type.Date',
                             'path': 'mdlForm>/DocumentDate',
@@ -91,8 +88,11 @@
                         }" 
                     />
 
-                    <Label text="{i18n>reportOnly}" />
-                    <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" />
+                    <Label text="{i18n>postType}" />
+                    <RadioButtonGroup id="idRBGPostType" columns="2" select="selectPostType" enabled="{= !${mdlForm>/Report} }">
+                        <RadioButton text="{i18n>radioFI}" class="sapUiMediumMarginEnd" selected="true" />
+                        <RadioButton text="{i18n>radioCO}" />
+                    </RadioButtonGroup>
 
                 </f:content>
             </f:SimpleForm>
@@ -121,6 +121,11 @@
                 <smartTable:customToolbar>
                     <OverflowToolbar design="Transparent">
                         <ToolbarSpacer />
+                        <Label text="{i18n>docNo}" class="sapUiTinyMarginEnd" visible="{mdlForm>/PrintOut}" />
+                        <MultiComboBox id="idMulInpDocNo" selectedKeys="{mdlForm>/FIDocumentNumber}" name="FIDocumentNumber" items="{mdlForm>/SenderPostedDocNum}" visible="{mdlForm>/PrintOut}"
+                            width="300px" class="sapUiSmallMarginTopBottom">
+                            <core:Item key="{mdlForm>DocumentNumber}" text="{mdlForm>DocumentNumber}" />
+                        </MultiComboBox>
                         <OverflowToolbarButton  tooltip="{i18n>printOut}" icon="sap-icon://pdf-attachment" enabled="{mdlForm>/PrintOut}"
                             press="onPDFDisplay" />
                     </OverflowToolbar>

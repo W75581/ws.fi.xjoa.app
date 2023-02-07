@@ -5,6 +5,7 @@ sap.ui.define([], function () {
             "CompanyCode": [],
             "FICODocument": "FI",
             "FIDocumentNumber": [],
+            "SenderPostedDocNum": [],
             "Report": false,
             "Busy": false,
             "PrintOut": false,
