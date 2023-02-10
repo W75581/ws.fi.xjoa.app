@@ -45,13 +45,25 @@ sap.ui.define([
                 this._oConstant = oComponent ? oComponent.getModel("constant").getData() : undefined;
                 this._oModel = oComponent.getModel();
 
-                var oFormObject = this._oConstant["FORM_OBJECT"];
+                var oFormObject = JSON.parse(JSON.stringify(this._oConstant["FORM_OBJECT"])); //deep copy
                 var oModel = new JSONModel(oFormObject);
                 this.getView().setModel(oModel,"mdlForm");
                 this._oFormMdl = this.getView().getModel("mdlForm");
-                this._setDefaultPstDate();
 
                 this._oSmartTable = this.byId("idMainTable");
+
+                oComponent.getRouter().getRoute("RouteMain").attachPatternMatched(this._onXJOAMatched, this);
+            },
+
+            /**
+             * Reset the Form Model everytime the page is loaded.
+             * @private
+             */
+            _onXJOAMatched: function () {
+                if (this._oFormMdl) this._oFormMdl.setData(JSON.parse(JSON.stringify(this._oConstant["FORM_OBJECT"])));
+                if (this._oPDFURI) URL.revokeObjectURL(this._oPDFURI);
+
+                this._setDefaultPstDate();
             },
 
             /**
@@ -595,7 +607,7 @@ sap.ui.define([
             _onDataReceived: function (oEvent) {
                 var arrData = oEvent.getParameter("data")["results"];
                 var iDataLength = arrData.length;
-                var arrDocNum = this._oFormMdl.getProperty("/SenderPostedDocNum");
+                var arrDocNum = [];
                 this._oFormMdl.setProperty("/Busy", false);
                 
                 if(this._oFormMdl.getProperty("/Simulate") && !this._oFormMdl.getProperty("/Report") && iDataLength > 0) {
@@ -610,6 +622,8 @@ sap.ui.define([
                     });
                     this._oFormMdl.setProperty("/PrintOut", true);
                 }
+
+                this._oFormMdl.setProperty("/SenderPostedDocNum", arrDocNum);
             },
 
             /**
