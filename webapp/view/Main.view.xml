@@ -1,142 +1,261 @@
-<mvc:View
+<mvc:View height="100%"
     controllerName="ws.fi.xjoa.app.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
-    displayBlock="true"
-    height="100%"
     xmlns="sap.m"
-    xmlns:semantic="sap.f.semantic"
-    xmlns:l="sap.ui.layout"
-    xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
     xmlns:table="sap.ui.table"
-    xmlns:smartTable="sap.ui.comp.smarttable">
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:sv="sap.ui.comp.smartvariants"
+    xmlns:semantic="sap.f.semantic"
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
 
-    <semantic:SemanticPage showFooter="{mdlForm>/ShowFooter}" busy="{mdlForm>/Busy}" busyIndicatorDelay="0"
-		titleAreaShrinkRatio="1.6:1:1.6">
+    <semantic:SemanticPage showFooter="{mdlForm>/ShowFooter}" busy="{mdlForm>/Busy}" busyIndicatorDelay="0">
 
         <semantic:titleHeading>
-            <Title text="{i18n>title}" />
+            <sv:SmartVariantManagement id="idSVMVariant" showShare="true"
+				persistencyKey="ws.fi.xjoa.app.view.Main" showExecuteOnSelection="true" entitySet="Adjustment"/>
         </semantic:titleHeading>
 
+        <semantic:titleSnappedContent>
+            <Text text="{mdlForm>/FiltersSnappedText}" />
+        </semantic:titleSnappedContent>
+
         <semantic:headerContent>
-            <f:SimpleForm id="idMainForm" editable="true" layout="ColumnLayout" class="sapUiTinyMarginTopBottom">
-                <f:content>
+            <smartFilterBar:SmartFilterBar id="idSFBFilter" smartVariant="idSVMVariant"
+                useToolbar="false" entitySet="Adjustment" showClearOnFB="true" search="onActivateSimulate"
+                showFilterConfiguration="false" persistencyKey="ws.fi.xjoa.app.view.Main.FilterBar"
+                assignedFiltersChanged="onAssignedFiltersChanged" enableBasicSearch="false" filterChange="onFilterChanged"
+                beforeVariantFetch="onBeforeVariantFetch" afterVariantLoad="onAfterVariantLoad"
+                initialized="onSmartFilterInitialized" showGoOnFB="{mdlForm>/SearchEnabled}">
 
-                    <Label text="{i18n>companyCode}" required="true"/>
-                    <MultiInput id="idMulInpCompCode" required="true" value="{CompanyCode}" tokens="{path: 'mdlForm>/CompanyCodeVal'}" name="CompanyCode" suggestionRows="{/I_CompanyCode}"
-                    tokenUpdate="onUpdateTokens" valueHelpRequest="onValueHelpRequested" suggestionItemSelected="onSuggestedItemSelected">
-                        <tokens>
-                            <Token key="{mdlForm>key}" text="{mdlForm>text}" />
-                        </tokens>
-                        <suggestionColumns>
-                            <Column hAlign="Begin" popinDisplay="Inline" demandPopin="true">
-                                <Label text="{i18n>companyCode}" />
-                            </Column>
-                            <Column hAlign="Begin" popinDisplay="Inline" demandPopin="true">
-                                <Label text="{i18n>description}" />
-                            </Column>
-                        </suggestionColumns>
-                        <suggestionRows>
-                            <ColumnListItem>
-                                <Label text="{CompanyCode}" />
-                                <Label text="{CompanyCodeName}" />
-                            </ColumnListItem>
-                        </suggestionRows>
-                    </MultiInput>
+                <smartFilterBar:controlConfiguration>
+                    <smartFilterBar:ControlConfiguration key="CompanyCode" label="{i18n>companyCode}" mandatory="mandatory" controlType="input"
+                        filterType="auto" conditionPanelDefaultOperation="BT" />
+                    <smartFilterBar:ControlConfiguration key="FiscalYear" mandatory="mandatory" controlType="dropDownList" filterType="single" />
+                    <smartFilterBar:ControlConfiguration key="Period" mandatory="mandatory" controlType="input" filterType="single" displayBehaviour="descriptionOnly" />
 
-                    <Label text="{i18n>periodFisYr}" />
-                    <ComboBox required="true" id="idComboBxFisYr" selectedKey="{mdlForm>/FiscalYear}" items="{path: '/ZFI_IQ_FISCAL_YEAR'}">
-                        <core:ListItem key="{FiscalYear}" text="{FiscalYear}" />
-                        <layoutData>
-                            <f:ColumnElementData cellsLarge="4" cellsSmall="6" />
-                        </layoutData>
-                    </ComboBox>
-                    <ComboBox required="true" id="idComboBxFisYrPrd" selectedKey="{mdlForm>/Period}" items="{path: '/ZFI_IQ_FY_PERIOD'}">
-                        <core:ListItem key="{FiscalPeriod}" text="{ path: 'FiscalPeriod', formatter: '.removeLeadingZeroes' }" />
-                    </ComboBox>
+                    <smartFilterBar:ControlConfiguration key="CustomReport" label="{i18n>reportOnly}">
+                        <smartFilterBar:customControl>
+                            <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" select="onSelectCheckBox" />
+                        </smartFilterBar:customControl>
+                    </smartFilterBar:ControlConfiguration>
 
-                    <Label text="{i18n>reportOnly}" />
-                    <CheckBox id="idCBRprtOnly" selected="{mdlForm>/Report}" />
+                    <smartFilterBar:ControlConfiguration key="CustomPostingType" label="{i18n>postType}" mandatory="mandatory">
+                        <smartFilterBar:customControl>
+                            <Select selectedKey="{mdlForm>/PostingType}" items="{mdlForm>/PostingTypes}"
+                                enabled="{= !${mdlForm>/Report} }">
+                                <core:Item key="{mdlForm>key}" text="{mdlForm>text}" />
+                            </Select>
+                        </smartFilterBar:customControl>
+                    </smartFilterBar:ControlConfiguration>
+                    
+                    <smartFilterBar:ControlConfiguration key="PostingDate" label="{i18n>postDate}" mandatory="mandatory">
+                        <smartFilterBar:customControl>
+                            <DatePicker id="idMulInpPstDte" placeholder="{i18n>plceHldrPostDte}" enabled="{= !${mdlForm>/Report} }"
+                                value="{
+                                    'type': 'sap.ui.model.type.Date',
+                                    'path': 'mdlForm>/PostingDate',
+                                    'formatOptions': {
+                                        'pattern': 'dd/MM/y',
+                                        'UTC': true
+                                    }
+                                }" busyIndicatorDelay="0" />
+                        </smartFilterBar:customControl>
+                    </smartFilterBar:ControlConfiguration>
 
-                    <!-- <Label text="{i18n>docNo}" />
-                    <MultiInput id="idMulInpDocNo" value="{FIDocumentNumber}" tokens="{path: 'mdlForm>/FIDocNoVal'}" name="FIDocumentNumber"
-                    tokenUpdate="onUpdateTokens" valueHelpOnly="true" valueHelpRequest="onMultipleConditionsVHRequested">
-                        <tokens>
-                            <Token key="{mdlForm>key}" text="{mdlForm>text}" />
-                        </tokens>
-                    </MultiInput> -->
+                    <smartFilterBar:ControlConfiguration key="CustomDocumentDate" label="{i18n>docDate}" mandatory="mandatory">
+                        <smartFilterBar:customControl>
+                            <DatePicker id="idMulInpDocDte" placeholder="{i18n>plceHldrPostDte}" enabled="{= !${mdlForm>/Report} }"
+                                value="{
+                                    'type': 'sap.ui.model.type.Date',
+                                    'path': 'mdlForm>/DocumentDate',
+                                    'formatOptions': {
+                                        'pattern': 'dd/MM/y',
+                                        'UTC': true
+                                    }
+                                }" busyIndicatorDelay="0" />
+                        </smartFilterBar:customControl>
+                    </smartFilterBar:ControlConfiguration>
 
-                    <Label text="{i18n>postDate}" />
-                    <DatePicker id="idMulInpPstDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" enabled="{= !${mdlForm>/Report} }"
-                        value="{
-                            'type': 'sap.ui.model.type.Date',
-                            'path': 'mdlForm>/PostingDate',
-                            'formatOptions': {
-                                'pattern': 'dd/MM/y'
-                            }
-                        }" 
-                    />
+                </smartFilterBar:controlConfiguration>
 
-                    <Label text="{i18n>docDate}" />
-                    <DatePicker id="idMulInpDocDte" placeholder="{i18n>plceHldrPostDte}" change="handlePostDateChg" enabled="{= !${mdlForm>/Report} }"
-                        value="{
-                            'type': 'sap.ui.model.type.Date',
-                            'path': 'mdlForm>/DocumentDate',
-                            'formatOptions': {
-                                'pattern': 'dd/MM/y'
-                            }
-                        }" 
-                    />
-
-                    <Label text="{i18n>postType}" />
-                    <RadioButtonGroup id="idRBGPostType" columns="2" select="selectPostType" enabled="{= !${mdlForm>/Report} }">
-                        <RadioButton text="{i18n>radioFI}" class="sapUiMediumMarginEnd" selected="true" />
-                        <RadioButton text="{i18n>radioCO}" />
-                    </RadioButtonGroup>
-
-                </f:content>
-            </f:SimpleForm>
-            <HBox alignItems="Start" justifyContent="End" class="sapUiTinyMarginTopBottom">
-				<Button text="{i18n>simulate}" class="sapUiSmallMarginEnd" type="Emphasized" press="onSimulateForm" />
-                <Button text="{i18n>clear}" type="Transparent" press="onClearForm" />
-			</HBox>
+                <!-- layout data used to make the table growing but the filter bar fixed -->
+                <smartFilterBar:layoutData>
+                    <FlexItemData shrinkFactor="0"/>
+                </smartFilterBar:layoutData>
+            </smartFilterBar:SmartFilterBar>
         </semantic:headerContent>
 
         <semantic:content>
-            <smartTable:SmartTable
-                class="sapUiSmallMargin"
-                id="idMainTable"
-                entitySet="Adjustment"
-                tableType="Table"
-                beforeExport="onBeforeExport"
-                useTablePersonalisation="false"
-                header="Items"
-                showRowCount="true"
-                showVariantManagement="false"
-                persistencyKey="SmartTableAnalytical_Explored"
-                enableAutoColumnWidth="true"
-                beforeRebindTable="onBeforeRebindTable"
-                initialNoDataText="{i18n>initialNoDataText}">
+            <smartTable:SmartTable class="sapUiResponsiveContentPadding" id="idMainTable" entitySet="Adjustment"
+                header="{i18n>items}" enableExport="false" useExportToExcel="false"
+                useTablePersonalisation="false" showRowCount="true" showVariantManagement="false"
+                persistencyKey="ws.fi.xjoa.app.view.Main.SmartTable"
+                beforeRebindTable="onBeforeRebindTable" initialNoDataText="{i18n>initialNoDataText}"
+                smartFilterId="idSFBFilter" smartVariant="idSVMVariant" height="100%">
 
                 <smartTable:customToolbar>
                     <OverflowToolbar design="Transparent">
-                        <ToolbarSpacer />
-                        <Label text="{i18n>docNo}" class="sapUiTinyMarginEnd" visible="{mdlForm>/PrintOut}" />
+                        <ToolbarSpacer/>
+                        <Label text="{i18n>docNum}" class="sapUiTinyMarginEnd" visible="{mdlForm>/PrintOut}" />
                         <MultiComboBox id="idMulInpDocNo" selectedKeys="{mdlForm>/FIDocumentNumber}" name="FIDocumentNumber" items="{mdlForm>/SenderPostedDocNum}" visible="{mdlForm>/PrintOut}"
                             width="300px" class="sapUiSmallMarginTopBottom">
                             <core:Item key="{mdlForm>DocumentNumber}" text="{mdlForm>DocumentNumber}" />
                         </MultiComboBox>
                         <OverflowToolbarButton  tooltip="{i18n>printOut}" icon="sap-icon://pdf-attachment" enabled="{mdlForm>/PrintOut}"
                             press="onPDFDisplay" />
+                        <OverflowToolbarButton icon="sap-icon://excel-attachment" press="onExportToExcel" enabled="{mdlForm>/ExportEnabled}"/>
                     </OverflowToolbar>
                 </smartTable:customToolbar>
 
-                <table:Table alternateRowColors="true" selectionMode="None" threshold="0" visibleRowCountMode="Auto" />
+                <!--Due to project requirements, threshold is set to maximum to load all data -->
+                <table:Table alternateRowColors="true" threshold="999999999" visibleRowCountMode="Auto" selectionMode="None">
+                    <table:columns>
+
+                        <table:Column width="170px"
+                            customData:p13nData='\{"columnKey": "CompanyCode", "leadingProperty":"CompanyCode", "columnIndex": "0"}'>
+                            <Label text="{/#AdjustmentType/CompanyCode/@sap:label}" />
+                            <table:template>
+                                <Text text="{CompanyCode}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="115px"
+                            customData:p13nData='\{"columnKey": "ControllingArea", "leadingProperty":"ControllingArea", "columnIndex": "1"}'>
+                            <Label text="{/#AdjustmentType/ControllingArea/@sap:label}" />
+                            <table:template>
+                                <Text text="{ControllingArea}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column hAlign="End" width="85px"
+                            customData:p13nData='\{"columnKey": "FiscalYear", "leadingProperty":"FiscalYear", "columnIndex": "2"}'>
+                            <Label text="{/#AdjustmentType/FiscalYear/@sap:label}" />
+                            <table:template>
+                                <Text text="{FiscalYear}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column hAlign="End" width="60px"
+                            customData:p13nData='\{"columnKey": "Period", "leadingProperty":"Period", "columnIndex": "3"}'>
+                            <Label text="{/#AdjustmentType/Period/@sap:label}" />
+                            <table:template>
+                                <Text text="{path: 'Period', formatter: '.removeLeadingZeroes'}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="110px"
+                            customData:p13nData='\{"columnKey": "CAPEXOPEX", "leadingProperty":"CAPEXOPEX", "columnIndex": "5"}'>
+                            <Label text="{/#AdjustmentType/CAPEXOPEX/@sap:label}" />
+                            <table:template>
+                                <Text text="{CAPEXOPEX}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="95px"
+                            customData:p13nData='\{"columnKey": "SenderEG", "leadingProperty":"SenderEG", "columnIndex": "7"}'>
+                            <Label text="{/#AdjustmentType/SenderEG/@sap:label}" />
+                            <table:template>
+                                <Text text="{SenderEG}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="175px"
+                            customData:p13nData='\{"columnKey": "SenderBASEntityGroup", "leadingProperty":"SenderBASEntityGroup", "columnIndex": "8"}'>
+                            <Label text="{/#AdjustmentType/SenderBASEntityGroup/@sap:label}" />
+                            <table:template>
+                                <Text text="{SenderBASEntityGroup}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="175px"
+                            customData:p13nData='\{"columnKey": "ReceiverCompanyCode", "leadingProperty":"ReceiverCompanyCode", "columnIndex": "9"}'>
+                            <Label text="{/#AdjustmentType/ReceiverCompanyCode/@sap:label}" />
+                            <table:template>
+                                <Text text="{ReceiverCompanyCode}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="95px"
+                            customData:p13nData='\{"columnKey": "ReceiverEG", "leadingProperty":"ReceiverEG", "columnIndex": "11"}'>
+                            <Label text="{/#AdjustmentType/ReceiverEG/@sap:label}" />
+                            <table:template>
+                                <Text text="{ReceiverEG}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="185px"
+                            customData:p13nData='\{"columnKey": "ReceiverBASEntityGroup", "leadingProperty":"ReceiverBASEntityGroup", "columnIndex": "12"}'>
+                            <Label text="{/#AdjustmentType/ReceiverBASEntityGroup/@sap:label}" />
+                            <table:template>
+                                <Text text="{ReceiverBASEntityGroup}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="235px"
+                            customData:p13nData='\{"columnKey": "SenderPostedDocNum", "leadingProperty":"SenderPostedDocNum", "columnIndex": "22"}'>
+                            <Label text="{/#AdjustmentType/SenderPostedDocNum/@sap:label}" />
+                            <table:template>
+                                <Text text="{SenderPostedDocNum}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column hAlign="End" width="250px"
+                            customData:p13nData='\{"columnKey": "SenderPostedDocFY", "leadingProperty":"SenderPostedDocFY", "columnIndex": "23"}'>
+                            <Label text="{/#AdjustmentType/SenderPostedDocFY/@sap:label}" />
+                            <table:template>
+                                <Text text="{SenderPostedDocFY}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="250px"
+                            customData:p13nData='\{"columnKey": "ReceiverPostedDocNum", "leadingProperty":"ReceiverPostedDocNum", "columnIndex": "24"}'>
+                            <Label text="{/#AdjustmentType/ReceiverPostedDocNum/@sap:label}" />
+                            <table:template>
+                                <Text text="{ReceiverPostedDocNum}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column hAlign="End" width="260px"
+                            customData:p13nData='\{"columnKey": "ReceiverPostedDocFY", "leadingProperty":"ReceiverPostedDocFY", "columnIndex": "25"}'>
+                            <Label text="{/#AdjustmentType/ReceiverPostedDocFY/@sap:label}" />
+                            <table:template>
+                                <Text text="{ReceiverPostedDocFY}" />
+                            </table:template>
+                        </table:Column>
+
+                        <table:Column width="350px"
+                            customData:p13nData='\{"columnKey": "Message", "leadingProperty":"Message", "columnIndex": "26"}'>
+                            <Label text="{/#AdjustmentType/Message/@sap:label}" />
+                            <table:template>
+                                <ExpandableText class="sapUiTinyMarginTopBottom" text="{Message}" overflowMode="InPlace" />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+
+                    <table:rowSettingsTemplate>
+                        <table:RowSettings highlight="{= ${mdlForm>/Simulate} ? 'None' : ${SenderPostedDocNum} !== '' || ${ReceiverPostedDocNum} !== '' ? 'Success' : ${Message} !== '' ? 'Error' : 'None' }" />
+                    </table:rowSettingsTemplate>
+
+                </table:Table>
             </smartTable:SmartTable>
         </semantic:content>
 
+        <semantic:messagesIndicator>
+            <semantic:MessagesIndicator id="idMIButton" press="onOpenMessages" visible="{= ${message>/}.length > 0 }" >
+                <semantic:dependents>
+                    <MessagePopover id="idMPMessages" items="{message>/}">
+                        <MessageItem title="{message>message}" subtitle="{message>additionalText}"
+                            type="{message>type}" description="{message>description}" groupName="{message>groupName}" />
+                    </MessagePopover>
+                </semantic:dependents>
+            </semantic:MessagesIndicator>
+        </semantic:messagesIndicator>
+
         <semantic:footerMainAction>
-            <semantic:FooterMainAction text="{i18n>confirmPost}" press="onConfirmPost" enabled="{mdlForm>/ShowFooter}" />
+            <semantic:FooterMainAction text="{i18n>confirmPost}" press="onConfirmPost"
+                enabled="{mdlForm>/ShowFooter}" visible="{= !${mdlForm>/Posting} }" />
         </semantic:footerMainAction>
 
     </semantic:SemanticPage>
