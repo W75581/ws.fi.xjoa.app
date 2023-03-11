@@ -16,6 +16,7 @@ sap.ui.define([
         FI_KEY: "FI",
         CO_KEY: "CO",
         FORM_OBJECT: {
+            SelectedIndices: [],
             CompanyCode: [],
             PostingType: "FI",
             PostingTypes: [],

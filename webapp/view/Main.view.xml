@@ -110,7 +110,9 @@
                 </smartTable:customToolbar>
 
                 <!--Due to project requirements, threshold is set to maximum to load all data -->
-                <table:Table alternateRowColors="true" threshold="999999999" visibleRowCountMode="Auto" selectionMode="None">
+                <table:Table alternateRowColors="true" threshold="999999999" visibleRowCountMode="Auto"
+                    selectionMode="{= ${mdlForm>/Posting} || ${mdlForm>/Report}  ? 'None' : 'MultiToggle' }"
+                    rowSelectionChange="onRowSelected">
                     <table:columns>
 
                         <table:Column width="170px"
@@ -255,7 +257,7 @@
 
         <semantic:footerMainAction>
             <semantic:FooterMainAction text="{i18n>confirmPost}" press="onConfirmPost"
-                enabled="{mdlForm>/ShowFooter}" visible="{= !${mdlForm>/Posting} }" />
+                enabled="{mdlForm>/ItemsSelected}" visible="{= !${mdlForm>/Posting} }" />
         </semantic:footerMainAction>
 
     </semantic:SemanticPage>

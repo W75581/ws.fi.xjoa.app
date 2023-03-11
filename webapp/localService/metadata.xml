@@ -46,7 +46,7 @@
                 <Property Name="ControllingArea" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Controlling Area" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="FiscalYear" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false"/>
                 <Property Name="Period" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Period" sap:creatable="false" sap:updatable="false" sap:sortable="false"/>
-                <Property Name="FIDocumentNumber" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="FI Document Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FIDocumentNumber" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="FI Document Number" sap:creatable="false" sap:updatable="false" sap:sortable="false"/>
                 <Property Name="CAPEXOPEX" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="CAPEX / OPEX" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="SenderJV" Type="Edm.String" MaxLength="6" sap:unicode="false" sap:label="Sender JV" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="SenderEG" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="Sender EG" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
